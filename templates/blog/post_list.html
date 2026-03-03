@@ -3,12 +3,18 @@
 {% block content %}
 <h1 style="margin-bottom: 1.5rem;">Blog posts</h1>
 {% for post in page_obj %}
-    <article class="card">
-        {% if post.image %}<img src="{{ post.image.url }}" alt="{{ post.title }}" style="max-width: 100%; height: auto; border-radius: 6px; margin-bottom: 0.75rem;">{% endif %}
-        <h3 style="margin: 0 0 0.5rem;"><a href="{% url 'blog:post_detail' post.pk %}" style="color: #16213e; text-decoration: none;">{{ post.title }}</a></h3>
-        <p style="margin: 0; color: #666; font-size: 0.9rem;">{{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}</p>
-        <p style="margin: 0.5rem 0 0;">{{ post.content|truncatewords:30 }}</p>
-    </article>
+    <a href="{% url 'blog:post_detail' post.pk %}" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
+        <article class="card">
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" style="max-width: 100%; height: auto; border-radius: 6px; margin-bottom: 0.75rem;">
+            {% endif %}
+            <h3 style="margin: 0 0 0.5rem;">{{ post.title }}</h3>
+            <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                {{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}
+            </p>
+            <p style="margin: 0.5rem 0 0;">{{ post.content|truncatewords:30 }}</p>
+        </article>
+    </a>
 {% empty %}
     <p>No posts yet. {% if user.is_authenticated %}<a href="{% url 'blog:post_create' %}">Write the first one</a>{% else %}Log in to publish your first post.{% endif %}</p>
 {% endfor %}
