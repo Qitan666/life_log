@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL, verbose_name='作者')),
             ],
             options={
-                'verbose_name': '博客文章',
-                'verbose_name_plural': '博客文章',
+                'verbose_name': 'Blog Posts',
+                'verbose_name_plural': 'Blog Posts',
                 'ordering': ['-created_at'],
             },
         ),
