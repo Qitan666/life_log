@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}Log in - Life Log{% endblock %}
 {% block content %}
-<div class="card" style="max-width: 400px; margin: 2rem auto;">
-    <h2 style="margin-top: 0;">Log in</h2>
+<div class="card auth-card">
+    <h2 class="card-title">Log in</h2>
     <form method="post" action="{% url 'accounts:login' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next }}">
@@ -13,8 +13,10 @@
                 {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
             </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary">Log in</button>
-        <a href="{% url 'accounts:register' %}" class="btn btn-secondary">No account yet? Sign up</a>
+        <div class="auth-actions">
+            <button type="submit" class="btn btn-primary">Log in</button>
+            <a href="{% url 'accounts:register' %}" class="btn btn-secondary">No account yet? Sign up</a>
+        </div>
     </form>
 </div>
 {% endblock %}

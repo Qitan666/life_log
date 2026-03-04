@@ -2,28 +2,37 @@
 {% block title %}{{ post.title }} - Life Log{% endblock %}
 {% block content %}
 <article class="card">
-    {% if post.image %}<img src="{{ post.image.url }}" alt="{{ post.title }}" style="max-width: 100%; height: auto; border-radius: 6px; margin-bottom: 1rem;">{% endif %}
-    <h1 style="margin: 0 0 0.5rem;">{{ post.title }}</h1>
-    <p style="margin: 0 0 1rem; color: #666;">{{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}{% if post.updated_at != post.created_at %} (updated {{ post.updated_at|date:"Y-m-d H:i" }}){% endif %}</p>
-    <div style="white-space: pre-wrap;">{{ post.content }}</div>
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="post-image">
+    {% endif %}
+    <h1 class="post-detail-title">{{ post.title }}</h1>
+    <p class="post-meta">
+        {{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}
+        {% if post.updated_at != post.created_at %}
+            (updated {{ post.updated_at|date:"Y-m-d H:i" }})
+        {% endif %}
+    </p>
+    <div class="post-content">{{ post.content }}</div>
+
     {% if user == post.author %}
-        <p style="margin-top: 1.5rem;">
+        <p class="actions-row">
             <a href="{% url 'blog:post_edit' post.pk %}" class="btn btn-primary">Edit</a>
             <a href="{% url 'blog:post_delete' post.pk %}" class="btn btn-danger">Delete</a>
         </p>
     {% endif %}
 </article>
 
-<section class="card" style="margin-top: 1.5rem;">
-    <h3 style="margin: 0 0 1rem;">Comments ({{ comments|length }})</h3>
+<section class="card comment-section">
+    <h3 class="comment-title">Comments ({{ comments|length }})</h3>
+
     {% for comment in comments %}
-        <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+        <div class="comment-item">
             <strong>{{ comment.author.username }}</strong>
-            <span style="color: #666; font-size: 0.9rem;"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
-            <p style="margin: 0.25rem 0 0; white-space: pre-wrap;">{{ comment.content }}</p>
+            <span class="comment-meta"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
+            <p class="comment-content">{{ comment.content }}</p>
         </div>
     {% empty %}
-        <p style="margin: 0; color: #666;">No comments yet.</p>
+        <p class="empty-text">No comments yet.</p>
     {% endfor %}
 
     {% if user.is_authenticated %}
@@ -36,9 +45,12 @@
             <button type="submit" class="btn btn-primary">Post comment</button>
         </form>
     {% else %}
-        <p style="margin-top: 1rem; color: #666;">Log in to post a comment. <a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a></p>
+        <p class="empty-text" style="margin-top: 1rem;">
+            Log in to post a comment.
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a>
+        </p>
     {% endif %}
 </section>
 
-<a href="{% url 'blog:post_list' %}">← Back to list</a>
+<a href="{% url 'blog:post_list' %}" class="back-link">← Back to list</a>
 {% endblock %}

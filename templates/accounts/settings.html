@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Account settings - Life Log{% endblock %}
 {% block content %}
+<h1 class="section-title">Account settings</h1>
+
 <div class="card">
-    <h2 style="margin-top: 0;">Profile</h2>
-    <form method="post" action="" style="margin-bottom: 1.5rem;">
+    <h2 class="card-title">Profile information</h2>
+    <form method="post" action="">
         {% csrf_token %}
         {% for field in profile_form %}
             <div class="form-group">
@@ -12,12 +14,14 @@
                 {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
             </div>
         {% endfor %}
-        <button type="submit" name="profile_submit" class="btn btn-primary">Save profile</button>
+        <div class="page-actions">
+            <button type="submit" name="profile_submit" class="btn btn-primary">Save profile</button>
+        </div>
     </form>
 </div>
 
-<div class="card">
-    <h2 style="margin-top: 0;">Change password</h2>
+<div class="card card-soft">
+    <h2 class="card-title">Change password</h2>
     <form method="post" action="">
         {% csrf_token %}
         {% for field in password_form %}
@@ -27,8 +31,9 @@
                 {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
             </div>
         {% endfor %}
-        <button type="submit" name="password_submit" class="btn btn-primary">Save new password</button>
+        <div class="page-actions">
+            <button type="submit" name="password_submit" class="btn btn-primary">Update password</button>
+        </div>
     </form>
 </div>
 {% endblock %}
-

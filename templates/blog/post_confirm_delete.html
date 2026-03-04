@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}Delete "{{ post.title }}" - Life Log{% endblock %}
+{% block title %}Delete post - Life Log{% endblock %}
 {% block content %}
-<div class="card">
-    <h2>Confirm delete</h2>
-    <p>Are you sure you want to delete the post "{{ post.title }}"? This operation cannot be undone.</p>
-    <form method="post" action="{% url 'blog:post_delete' post.pk %}">
+<div class="card card-soft">
+    <h1 class="section-title" style="margin-bottom: 1rem;">Delete post</h1>
+    <p class="confirm-text">
+        Are you sure you want to delete <strong>"{{ post.title }}"</strong>?
+    </p>
+    <p class="confirm-text">This action cannot be undone.</p>
+
+    <form method="post" style="margin-top: 1rem;">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Yes, delete</button>
         <a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-secondary">Cancel</a>
