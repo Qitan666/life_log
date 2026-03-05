@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -6,20 +7,48 @@ from django.http import JsonResponse
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
-
 def post_list(request):
-    posts = Post.objects.filter(is_published=True).prefetch_related('likes')
-    from django.core.paginator import Paginator
-    paginator = Paginator(posts, 8)
+    qs = Post.objects.filter(is_published=True)
+    category = request.GET.get('category', '').strip()
+    q = request.GET.get('q', '').strip()
+    sort = request.GET.get('sort', 'new').strip()  # new / old / popular
+
+    if category:
+        qs = qs.filter(category=category)
+
+    if q:
+        qs = qs.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q) |
+            Q(author__username__icontains=q)
+        )
+
+    if sort == 'old':
+        qs = qs.order_by('created_at')
+    elif sort == 'popular':
+        # 如果你还没做 likes，就先按 created_at 退化处理
+        if hasattr(Post, 'likes'):
+            qs = qs.order_by('-likes__count', '-created_at')
+        else:
+            qs = qs.order_by('-created_at')
+    else:
+        qs = qs.order_by('-created_at')
+
+    paginator = Paginator(qs, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
+    categories = Post.CATEGORY_CHOICES
     liked_post_ids = set()
-    if request.user.is_authenticated:
+
+    if request.user.is_authenticated and hasattr(request.user, 'liked_posts'):
         liked_post_ids = set(request.user.liked_posts.values_list('id', flat=True))
 
     return render(request, 'blog/post_list.html', {
         'page_obj': page_obj,
+        'categories': categories,
+        'selected_category': category,
+        'q': q,
+        'sort': sort,
         'liked_post_ids': liked_post_ids,
     })
 

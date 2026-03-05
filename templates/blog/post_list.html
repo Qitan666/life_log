@@ -4,6 +4,56 @@
 
 <h1 class="section-title">Blog posts</h1>
 
+<form class="filter-bar" method="get" action="">
+    <div class="filter-left">
+        <label class="filter-label" for="category">Category</label>
+        <select id="category" name="category" class="filter-select">
+            <option value="">All</option>
+            {% for value,label in categories %}
+                <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label class="filter-label" for="sort">Sort</label>
+        <select id="sort" name="sort" class="filter-select">
+            {% if sort == 'new' %}
+                <option value="new" selected>Newest</option>
+            {% else %}
+                <option value="new">Newest</option>
+            {% endif %}
+
+            {% if sort == 'old' %}
+                <option value="old" selected>Oldest</option>
+            {% else %}
+                <option value="old">Oldest</option>
+            {% endif %}
+
+            {% if sort == 'popular' %}
+                <option value="popular" selected>Popular</option>
+            {% else %}
+                <option value="popular">Popular</option>
+            {% endif %}
+        </select>
+    </div>
+
+    <div class="filter-right">
+        <input
+            type="text"
+            name="q"
+            value="{{ q }}"
+            class="filter-input"
+            placeholder="Search title, content, author..."
+        >
+        <button type="submit" class="btn btn-primary filter-btn">Search</button>
+
+        {% if selected_category or q or sort != 'new' %}
+            <a href="{% url 'blog:post_list' %}" class="btn btn-secondary filter-btn">Reset</a>
+        {% endif %}
+    </div>
+</form>
+
 <div class="post-list-wrap">
     {% for post in page_obj %}
         <article class="card post-card">
@@ -59,10 +109,10 @@
 {% if page_obj.has_other_pages %}
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}&category={{ selected_category }}&q={{ q }}&sort={{ sort }}">Previous</a>
         {% endif %}
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.next_page_number }}&category={{ selected_category }}&q={{ q }}&sort={{ sort }}">Next</a>
         {% endif %}
     </div>
 {% endif %}

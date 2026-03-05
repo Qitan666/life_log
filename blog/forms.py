@@ -17,7 +17,7 @@ class PostForm(forms.ModelForm):
     """Post create/edit form"""
     class Meta:
         model = Post
-        fields = ('title', 'content', 'image', 'is_published')
+        fields = ('title', 'category', 'content', 'image', 'is_published')
         labels = {
             'title': 'Title',
             'content': 'Body',

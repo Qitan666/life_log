@@ -2,8 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-
 class Post(models.Model):
+    CATEGORY_CHOICES = [
+        ('life', 'Life'),
+        ('study', 'Study'),
+        ('travel', 'Travel'),
+        ('food', 'Food'),
+        ('mood', 'Mood'),
+        ('tech', 'Tech'),
+    ]
+
     title = models.CharField(max_length=200)
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
@@ -12,7 +20,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=True)
 
-    # 新增：点赞用户列表
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='life')
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
 
     class Meta:
@@ -24,9 +32,8 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('blog:post_detail', args=[self.pk])
 
-    # 新增：点赞总数
     def total_likes(self):
-        return self.likes.count()
+        return self.likes.count() if hasattr(self, 'likes') else 0
 
 
 class Comment(models.Model):
