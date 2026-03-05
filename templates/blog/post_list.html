@@ -117,16 +117,35 @@
 
             {% if user.is_authenticated %}
                 <div class="post-actions-bar">
-                    <button
-                        type="button"
-                        class="like-btn {% if post.id in liked_post_ids %}liked{% endif %}"
-                        data-post-id="{{ post.pk }}"
-                        data-like-url="{% url 'blog:toggle_like' post.pk %}"
-                    >
-                        <span class="like-icon">♥</span>
-                        <span class="like-text">Like</span>
-                        <span class="like-count">{{ post.total_likes }}</span>
-                    </button>
+                    <a href="{% url 'blog:post_detail' post.pk %}#comments" class="meta-pill comment-pill">
+                        <span class="meta-icon">💬</span>
+                        <span class="meta-text">Comments</span>
+                        <span class="meta-count">{{ post.comment_total }}</span>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <button
+                            type="button"
+                            class="like-btn {% if post.id in liked_post_ids %}liked{% endif %}"
+                            data-post-id="{{ post.pk }}"
+                            data-like-url="{% url 'blog:toggle_like' post.pk %}"
+                        >
+                            <span class="like-icon">♥</span>
+                            <span class="like-text">Like</span>
+                            <span class="like-count">{{ post.total_likes }}</span>
+                        </button>
+                    {% else %}
+                        <button
+                            type="button"
+                            class="like-btn"
+                            disabled
+                            title="Log in to like posts"
+                        >
+                            <span class="like-icon">♥</span>
+                            <span class="like-text">Like</span>
+                            <span class="like-count">{{ post.total_likes }}</span>
+                        </button>
+                    {% endif %}
                 </div>
             {% else %}
                 <div class="post-actions-bar">

@@ -1,20 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
-from django.shortcuts import render
-from django.db.models import Q, Count
-from django.core.paginator import Paginator
-from .models import Post
-
 
 def post_list(request):
-    qs = Post.objects.filter(is_published=True)
+    qs = Post.objects.filter(is_published=True).annotate(comment_total=Count('comments', distinct=True))
 
     category = request.GET.get('category', '').strip()
     q = request.GET.get('q', '').strip()
