@@ -7,11 +7,18 @@ from django.http import JsonResponse
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
+from django.shortcuts import render
+from django.db.models import Q, Count
+from django.core.paginator import Paginator
+from .models import Post
+
+
 def post_list(request):
     qs = Post.objects.filter(is_published=True)
+
     category = request.GET.get('category', '').strip()
     q = request.GET.get('q', '').strip()
-    sort = request.GET.get('sort', 'new').strip()  # new / old / popular
+    sort = request.GET.get('sort', 'new').strip()
 
     if category:
         qs = qs.filter(category=category)
@@ -26,9 +33,8 @@ def post_list(request):
     if sort == 'old':
         qs = qs.order_by('created_at')
     elif sort == 'popular':
-        # 如果你还没做 likes，就先按 created_at 退化处理
         if hasattr(Post, 'likes'):
-            qs = qs.order_by('-likes__count', '-created_at')
+            qs = qs.annotate(like_total=Count('likes')).order_by('-like_total', '-created_at')
         else:
             qs = qs.order_by('-created_at')
     else:
@@ -37,9 +43,15 @@ def post_list(request):
     paginator = Paginator(qs, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    categories = Post.CATEGORY_CHOICES
-    liked_post_ids = set()
 
+    categories = Post.CATEGORY_CHOICES
+
+    current_category_label = 'All Posts'
+    if category:
+        category_map = dict(Post.CATEGORY_CHOICES)
+        current_category_label = category_map.get(category, 'Filtered Posts')
+
+    liked_post_ids = set()
     if request.user.is_authenticated and hasattr(request.user, 'liked_posts'):
         liked_post_ids = set(request.user.liked_posts.values_list('id', flat=True))
 
@@ -47,6 +59,7 @@ def post_list(request):
         'page_obj': page_obj,
         'categories': categories,
         'selected_category': category,
+        'current_category_label': current_category_label,
         'q': q,
         'sort': sort,
         'liked_post_ids': liked_post_ids,

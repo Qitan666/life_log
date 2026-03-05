@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // ===== Like button =====
     const likeButtons = document.querySelectorAll(".like-btn");
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
@@ -42,8 +43,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 void button.offsetWidth;
                 button.classList.add("pop");
             } catch (error) {
-                console.error(error);
+                console.error("like error:", error);
             }
         });
     });
+
+    // ===== Sidebar toggle =====
+    const sidebar = document.getElementById("categorySidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const sidebarClose = document.getElementById("sidebarClose");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+
+    function openSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.add("open");
+        if (sidebarBackdrop) sidebarBackdrop.classList.add("show");
+    }
+
+    function closeSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.remove("open");
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove("show");
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", openSidebar);
+    }
+
+    if (sidebarClose) {
+        sidebarClose.addEventListener("click", closeSidebar);
+    }
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener("click", closeSidebar);
+    }
 });
