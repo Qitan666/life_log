@@ -13,6 +13,31 @@
         {% endif %}
     </p>
     <div class="post-content">{{ post.content }}</div>
+    <div class="post-actions-bar">
+    {% if user.is_authenticated %}
+        <button
+            type="button"
+            class="like-btn {% if has_liked %}liked{% endif %}"
+            data-post-id="{{ post.pk }}"
+            data-like-url="{% url 'blog:toggle_like' post.pk %}"
+        >
+            <span class="like-icon">♥</span>
+            <span class="like-text">Like</span>
+            <span class="like-count">{{ post.total_likes }}</span>
+        </button>
+    {% else %}
+        <button
+            type="button"
+            class="like-btn"
+            disabled
+            title="Log in to like posts"
+        >
+            <span class="like-icon">♥</span>
+            <span class="like-text">Like</span>
+            <span class="like-count">{{ post.total_likes }}</span>
+        </button>
+    {% endif %}
+</div>
 
     {% if user == post.author %}
         <p class="actions-row">

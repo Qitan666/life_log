@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}Life Log - Blog{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
     {% block extra_css %}{% endblock %}
@@ -23,6 +24,7 @@
             {% endif %}
         </nav>
     </header>
+
     <main class="container">
         {% if messages %}
             <ul class="messages">
@@ -31,11 +33,15 @@
                 {% endfor %}
             </ul>
         {% endif %}
+
         {% block content %}{% endblock %}
     </main>
+
     <footer>
         <p>Life Log · Django Blog</p>
     </footer>
+
+    <script src="{% static 'js/site.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
