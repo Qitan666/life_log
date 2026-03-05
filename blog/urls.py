@@ -10,6 +10,9 @@ urlpatterns = [
     path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
     path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
 
-    # 新增
     path('post/<int:pk>/like/', views.toggle_like, name='toggle_like'),
+
+    path('post/<int:pk>/comment/', views.comment_create, name='comment_create'),
+    path('post/<int:pk>/comment/<int:comment_id>/edit/', views.comment_edit, name='comment_edit'),
+    path('post/<int:pk>/comment/<int:comment_id>/delete/', views.comment_delete, name='comment_delete'),
 ]

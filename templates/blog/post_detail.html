@@ -47,21 +47,36 @@
     {% endif %}
 </article>
 
-<section class="card comment-section">
-    <h3 class="comment-title">Comments ({{ comments|length }})</h3>
+<section class="card" style="margin-top: 1.5rem;" id="comments">
+    <h3 style="margin: 0 0 1rem;">Comments ({{ comments|length }})</h3>
 
     {% for comment in comments %}
-        <div class="comment-item">
-            <strong>{{ comment.author.username }}</strong>
-            <span class="comment-meta"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
-            <p class="comment-content">{{ comment.content }}</p>
+        <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div>
+                    <strong>{{ comment.author.username }}</strong>
+                    <span style="color: #666; font-size: 0.9rem;"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                </div>
+
+                {% if user.is_authenticated and user == comment.author %}
+                    <div style="display:flex; gap:8px;">
+                        <a class="btn btn-secondary" style="padding:6px 10px;"
+                           href="{% url 'blog:comment_edit' post.pk comment.pk %}">Edit</a>
+
+                        <a class="btn btn-danger" style="padding:6px 10px;"
+                           href="{% url 'blog:comment_delete' post.pk comment.pk %}">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <p style="margin: 0.25rem 0 0; white-space: pre-wrap;">{{ comment.content }}</p>
         </div>
     {% empty %}
-        <p class="empty-text">No comments yet.</p>
+        <p style="margin: 0; color: #666;">No comments yet.</p>
     {% endfor %}
 
     {% if user.is_authenticated %}
-        <form method="post" action="" style="margin-top: 1rem;">
+        <form method="post" action="{% url 'blog:comment_create' post.pk %}" style="margin-top: 1rem;">
             {% csrf_token %}
             <div class="form-group">
                 {{ comment_form.content }}
@@ -70,7 +85,7 @@
             <button type="submit" class="btn btn-primary">Post comment</button>
         </form>
     {% else %}
-        <p class="empty-text" style="margin-top: 1rem;">
+        <p style="margin-top: 1rem; color: #666;">
             Log in to post a comment.
             <a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a>
         </p>

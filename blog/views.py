@@ -26,28 +26,72 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk, is_published=True)
-    comments = post.comments.select_related('author')
+    comments = post.comments.select_related('author').all()
 
-    if request.method == 'POST' and request.user.is_authenticated:
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            return redirect('blog:post_detail', pk=post.pk)
-    else:
-        comment_form = CommentForm()
-
-    has_liked = False
-    if request.user.is_authenticated:
-        has_liked = post.likes.filter(pk=request.user.pk).exists()
+    comment_form = CommentForm() if request.user.is_authenticated else None
 
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
         'comment_form': comment_form,
-        'has_liked': has_liked,
+    })
+
+@login_required
+def comment_create(request, pk):
+    post = get_object_or_404(Post, pk=pk, is_published=True)
+
+    if request.method != 'POST':
+        return redirect(post.get_absolute_url())
+
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+        messages.success(request, 'Comment posted.')
+    else:
+        messages.error(request, 'Please fix the comment and try again.')
+
+    return redirect(post.get_absolute_url() + '#comments')
+
+
+@login_required
+def comment_edit(request, pk, comment_id):
+    post = get_object_or_404(Post, pk=pk, is_published=True)
+    comment = get_object_or_404(Comment, pk=comment_id, post=post, author=request.user)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Comment updated.')
+            return redirect(post.get_absolute_url() + '#comments')
+        else:
+            messages.error(request, 'Please fix the errors below.')
+    else:
+        form = CommentForm(instance=comment)
+
+    return render(request, 'blog/comment_form.html', {
+        'post': post,
+        'comment': comment,
+        'form': form,
+    })
+
+
+@login_required
+def comment_delete(request, pk, comment_id):
+    post = get_object_or_404(Post, pk=pk, is_published=True)
+    comment = get_object_or_404(Comment, pk=comment_id, post=post, author=request.user)
+
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, 'Comment deleted.')
+        return redirect(post.get_absolute_url() + '#comments')
+
+    return render(request, 'blog/comment_confirm_delete.html', {
+        'post': post,
+        'comment': comment,
     })
 
 

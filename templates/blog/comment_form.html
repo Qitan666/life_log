@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Edit comment - Life Log{% endblock %}
+
+{% block content %}
+<article class="card">
+    <h2 style="margin:0 0 1rem;">Edit comment</h2>
+    <p style="margin:0 0 1rem; color:#666;">
+        On: <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.content }}
+            {% if form.content.errors %}<div class="form-errors">{{ form.content.errors }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ post.get_absolute_url }}#comments" class="btn btn-secondary">Cancel</a>
+    </form>
+</article>
+{% endblock %}
