@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm, ProfileForm, UserPasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 def register_view(request):
@@ -52,33 +53,40 @@ def logout_view(request):
 
 @login_required
 def account_settings(request):
-    """Allow logged-in user to edit own username/email and password."""
     user = request.user
+
     if request.method == 'POST':
-        if 'profile_submit' in request.POST:
-            profile_form = ProfileForm(request.POST, instance=user)
+        if 'profile_submit' in request.POST or 'avatar_submit' in request.POST:
+            profile_form = ProfileForm(request.POST, request.FILES, instance=user)
             password_form = UserPasswordChangeForm(user=user)
+
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, 'Profile updated successfully.')
                 return redirect('accounts:settings')
+            else:
+                messages.error(request, f'Profile form errors: {profile_form.errors}')
+
         elif 'password_submit' in request.POST:
             profile_form = ProfileForm(instance=user)
             password_form = UserPasswordChangeForm(user=user, data=request.POST)
+
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
                 messages.success(request, 'Password changed successfully.')
                 return redirect('accounts:settings')
+            else:
+                messages.error(request, 'Please fix the password errors below.')
+        else:
+            profile_form = ProfileForm(instance=user)
+            password_form = UserPasswordChangeForm(user=user)
+
     else:
         profile_form = ProfileForm(instance=user)
         password_form = UserPasswordChangeForm(user=user)
 
-    return render(
-        request,
-        'accounts/settings.html',
-        {
-            'profile_form': profile_form,
-            'password_form': password_form,
-        },
-    )
+    return render(request, 'accounts/settings.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+    })

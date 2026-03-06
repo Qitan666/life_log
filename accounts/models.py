@@ -1,2 +1,9 @@
 from django.db import models
-# 使用 Django 内置 User 模型，无需额外定义
+from django.contrib.auth.models import User
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+
+    def __str__(self):
+        return f'Profile({self.user.username})'

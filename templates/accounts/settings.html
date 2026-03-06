@@ -1,23 +1,52 @@
 {% extends 'base.html' %}
 {% block title %}Account settings - Life Log{% endblock %}
 {% block content %}
+{% load static %}
 <h1 class="section-title">Account settings</h1>
 
 <div class="card">
-    <h2 class="card-title">Profile information</h2>
-    <form method="post" action="">
-        {% csrf_token %}
-        {% for field in profile_form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
-            </div>
-        {% endfor %}
-        <div class="page-actions">
-            <button type="submit" name="profile_submit" class="btn btn-primary">Save profile</button>
+    <h2 class="card-title">Profile</h2>
+
+    <div class="avatar-row">
+        <div class="avatar-preview">
+            {% if user.profile.avatar %}
+                <img class="avatar avatar-xl" src="{{ user.profile.avatar.url }}" alt="avatar">
+            {% else %}
+                <img class="avatar avatar-xl" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+            {% endif %}
         </div>
-    </form>
+
+        <div class="avatar-meta">
+            <p class="empty-text" style="margin-bottom:0.6rem;">
+                Your avatar will appear next to your posts and comments.
+            </p>
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+
+              <!-- username/email -->
+              <div class="form-group">
+                <label for="{{ profile_form.username.id_for_label }}">Username</label>
+                {{ profile_form.username }}
+                {% if profile_form.username.errors %}<div class="form-errors">{{ profile_form.username.errors }}</div>{% endif %}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ profile_form.email.id_for_label }}">Email</label>
+                {{ profile_form.email }}
+                {% if profile_form.email.errors %}<div class="form-errors">{{ profile_form.email.errors }}</div>{% endif %}
+              </div>
+
+              <!-- avatar -->
+              <div class="form-group">
+                <label for="{{ profile_form.avatar.id_for_label }}">Avatar</label>
+                {{ profile_form.avatar }}
+                {% if profile_form.avatar.errors %}<div class="form-errors">{{ profile_form.avatar.errors }}</div>{% endif %}
+              </div>
+
+              <button type="submit" name="profile_submit" class="btn btn-primary">Save profile</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="card card-soft">

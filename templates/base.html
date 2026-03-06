@@ -14,9 +14,21 @@
         <a href="{% url 'blog:post_list' %}"><strong>Life Log</strong></a>
         <nav>
             <a href="{% url 'blog:post_list' %}">Home</a>
+
             {% if user.is_authenticated %}
                 <a href="{% url 'blog:post_create' %}">Write</a>
-                <a href="{% url 'accounts:settings' %}">Account ({{ user.username }})</a>
+
+                <a href="{% url 'accounts:settings' %}">
+                    <span class="nav-user">
+                        {% if user.profile.avatar %}
+                            <img class="avatar avatar-xs" src="{{ user.profile.avatar.url }}" alt="avatar">
+                        {% else %}
+                            <img class="avatar avatar-xs" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+                        {% endif %}
+                        Account ({{ user.username }})
+                    </span>
+                </a>
+
                 <a href="{% url 'accounts:logout' %}">Log out</a>
             {% else %}
                 <a href="{% url 'accounts:login' %}">Log in</a>

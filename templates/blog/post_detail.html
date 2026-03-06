@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}{{ post.title }} - Life Log{% endblock %}
 {% block content %}
+{% load static %}
 <article class="card">
     {% if post.image %}
         <img src="{{ post.image.url }}" alt="{{ post.title }}" class="post-image">
     {% endif %}
     <h1 class="post-detail-title">{{ post.title }}</h1>
     <p class="post-meta">
-        {{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}
-        {% if post.updated_at != post.created_at %}
-            (updated {{ post.updated_at|date:"Y-m-d H:i" }})
-        {% endif %}
+        <span class="user-mini">
+            {% if post.author.profile.avatar %}
+                <img class="avatar avatar-sm" src="{{ post.author.profile.avatar.url }}" alt="avatar">
+            {% else %}
+                <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+            {% endif %}
+            <span>{{ post.author.username }}</span>
+        </span>
+        · {{ post.created_at|date:"Y-m-d H:i" }}
     </p>
     <div class="post-content">{{ post.content }}</div>
     <div class="post-actions-bar">
@@ -53,10 +59,17 @@
     {% for comment in comments %}
         <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                <div>
-                    <strong>{{ comment.author.username }}</strong>
-                    <span style="color: #666; font-size: 0.9rem;"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
-                </div>
+               <div class="comment-head">
+                   <span class="user-mini">
+                       {% if comment.author.profile.avatar %}
+                            <img class="avatar avatar-sm" src="{{ comment.author.profile.avatar.url }}" alt="avatar">
+                       {% else %}
+                            <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+                       {% endif %}
+                       <strong>{{ comment.author.username }}</strong>
+                   </span>
+                   <span class="comment-meta"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
+               </div>
 
                 {% if user.is_authenticated and user == comment.author %}
                     <div style="display:flex; gap:8px;">

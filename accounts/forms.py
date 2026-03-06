@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from .models import Profile
 
 
 class RegisterForm(UserCreationForm):
@@ -20,9 +21,9 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(label='Username')
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
-
 class ProfileForm(forms.ModelForm):
-    """Edit username & email for current user"""
+    avatar = forms.ImageField(required=False, label='Avatar')
+
     class Meta:
         model = User
         fields = ('username', 'email')
@@ -35,6 +36,10 @@ class ProfileForm(forms.ModelForm):
         self.user = kwargs.get('instance')
         super().__init__(*args, **kwargs)
 
+        if self.user:
+            profile, _ = Profile.objects.get_or_create(user=self.user)
+            self.fields['avatar'].initial = profile.avatar
+
     def clean_username(self):
         username = self.cleaned_data['username']
         qs = User.objects.filter(username=username)
@@ -43,6 +48,16 @@ class ProfileForm(forms.ModelForm):
         if qs.exists():
             raise forms.ValidationError('This username is already taken.')
         return username
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        profile, _ = Profile.objects.get_or_create(user=user)
+        avatar_file = self.cleaned_data.get('avatar')
+        if avatar_file:
+            profile.avatar = avatar_file
+            profile.save()
+
+        return user
 
 
 class UserPasswordChangeForm(PasswordChangeForm):

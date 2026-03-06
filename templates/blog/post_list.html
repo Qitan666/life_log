@@ -2,6 +2,7 @@
 {% block title %}Home - Life Log{% endblock %}
 
 {% block content %}
+{% load static %}
 
 <button type="button" id="sidebarToggle" class="category-handle" aria-label="Open category sidebar">
     ☰ Categories
@@ -111,7 +112,17 @@
                 </div>
 
                 <h3 class="post-title">{{ post.title }}</h3>
-                <p class="post-meta">{{ post.author.username }} · {{ post.created_at|date:"Y-m-d H:i" }}</p>
+                <p class="post-meta">
+                    <span class="user-mini">
+                        {% if post.author.profile.avatar %}
+                            <img class="avatar avatar-sm" src="{{ post.author.profile.avatar.url }}" alt="avatar">
+                        {% else %}
+                            <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+                        {% endif %}
+                        <span>{{ post.author.username }}</span>
+                    </span>
+                    · {{ post.created_at|date:"Y-m-d H:i" }}
+                </p>
                 <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
             </a>
 
@@ -123,38 +134,26 @@
                         <span class="meta-count">{{ post.comment_total }}</span>
                     </a>
 
-                    {% if user.is_authenticated %}
-                        <button
-                            type="button"
-                            class="like-btn {% if post.id in liked_post_ids %}liked{% endif %}"
-                            data-post-id="{{ post.pk }}"
-                            data-like-url="{% url 'blog:toggle_like' post.pk %}"
-                        >
-                            <span class="like-icon">♥</span>
-                            <span class="like-text">Like</span>
-                            <span class="like-count">{{ post.total_likes }}</span>
-                        </button>
-                    {% else %}
-                        <button
-                            type="button"
-                            class="like-btn"
-                            disabled
-                            title="Log in to like posts"
-                        >
-                            <span class="like-icon">♥</span>
-                            <span class="like-text">Like</span>
-                            <span class="like-count">{{ post.total_likes }}</span>
-                        </button>
-                    {% endif %}
+                    <button
+                        type="button"
+                        class="like-btn {% if post.id in liked_post_ids %}liked{% endif %}"
+                        data-post-id="{{ post.pk }}"
+                        data-like-url="{% url 'blog:toggle_like' post.pk %}"
+                    >
+                        <span class="like-icon">♥</span>
+                        <span class="like-text">Like</span>
+                        <span class="like-count">{{ post.total_likes }}</span>
+                    </button>
                 </div>
             {% else %}
                 <div class="post-actions-bar">
-                    <button
-                        type="button"
-                        class="like-btn"
-                        disabled
-                        title="Log in to like posts"
-                    >
+                    <a href="{% url 'blog:post_detail' post.pk %}#comments" class="meta-pill comment-pill">
+                        <span class="meta-icon">💬</span>
+                        <span class="meta-text">Comments</span>
+                        <span class="meta-count">{{ post.comment_total }}</span>
+                    </a>
+
+                    <button type="button" class="like-btn" disabled title="Log in to like posts">
                         <span class="like-icon">♥</span>
                         <span class="like-text">Like</span>
                         <span class="like-count">{{ post.total_likes }}</span>
