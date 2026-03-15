@@ -22,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-c)(faj6&ha(ki^g0=tyb6^3z2t24n4=m9=$r(k7#dyzu@nh8uh'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["life-log-ewzp.onrender.com", "127.0.0.1", "localhost"]
 
