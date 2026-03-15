@@ -1,3 +1,8 @@
-Django>=5.0
-Pillow>=10.0
-gunicorn
+asgiref==3.11.1
+Django==5.2
+gunicorn==25.1.0
+include==0.2.2
+packaging==26.0
+pillow==12.1.1
+sqlparse==0.5.5
+whitenoise==6.12.0
