@@ -67,10 +67,15 @@ def post_detail(request, pk):
 
     comment_form = CommentForm() if request.user.is_authenticated else None
 
+    has_liked = False
+    if request.user.is_authenticated:
+        has_liked = post.likes.filter(pk=request.user.pk).exists()
+
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
         'comment_form': comment_form,
+        'has_liked': has_liked,
     })
 
 @login_required
