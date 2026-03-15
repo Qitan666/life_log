@@ -34,8 +34,16 @@ ALLOWED_HOSTS = ["life-log-ewzp.onrender.com", "127.0.0.1", "localhost"]
 
 CSRF_TRUSTED_ORIGINS = ["https://life-log-ewzp.onrender.com"]
 
-# Application definition
+USE_CLOUDINARY = (
+    not DEBUG and
+    all([
+        os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        os.environ.get("CLOUDINARY_API_KEY"),
+        os.environ.get("CLOUDINARY_API_SECRET"),
+    ])
+)
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,11 +51,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "cloudinary",
-    "cloudinary_storage",
     'accounts',
     'blog',
 ]
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += [
+        'cloudinary',
+        'cloudinary_storage',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -113,21 +125,38 @@ USE_I18N = True
 
 USE_TZ = True
 
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
+if USE_CLOUDINARY:
+    cloudinary.config(
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.environ.get("CLOUDINARY_API_KEY"),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+        secure=True,
+    )
 
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+if USE_CLOUDINARY:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        'API_KEY': os.environ.get("CLOUDINARY_API_KEY"),
+        'API_SECRET': os.environ.get("CLOUDINARY_API_SECRET"),
+    }
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 
 # Static files (CSS, JavaScript, Images)
