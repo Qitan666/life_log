@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-c)(faj6&ha(ki^g0=tyb6^3z2t24n4=m9=$r(k7#dyzu@nh8uh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = ["life-log-ewzp.onrender.com", "127.0.0.1", "localhost"]
+
+CSRF_TRUSTED_ORIGINS = ["https://life-log-ewzp.onrender.com"]
 
 # Application definition
 
@@ -110,10 +112,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
-
-# 用户上传文件（博客封面图）
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # 登录相关
 LOGIN_URL = 'accounts:login'
