@@ -4,18 +4,32 @@
 {% block content %}
 {% load static %}
 
-<button type="button" id="sidebarToggle" class="category-handle" aria-label="Open category sidebar">
+<button
+    type="button"
+    id="sidebarToggle"
+    class="category-handle"
+    aria-label="Open category sidebar"
+    aria-expanded="false"
+    aria-controls="categorySidebar"
+>
     ☰ Categories
 </button>
 
-<aside id="categorySidebar" class="category-sidebar">
+<aside id="categorySidebar" class="category-sidebar" aria-labelledby="categorySidebarTitle">
     <div class="category-sidebar-inner">
         <div class="category-sidebar-head">
-            <h3>Post Categories</h3>
-            <button type="button" id="sidebarClose" class="category-close-btn" aria-label="Close sidebar">×</button>
+            <h3 id="categorySidebarTitle">Post Categories</h3>
+            <button
+                type="button"
+                id="sidebarClose"
+                class="category-close-btn"
+                aria-label="Close category sidebar"
+            >
+                ×
+            </button>
         </div>
 
-        <nav class="category-nav">
+        <nav class="category-nav" aria-label="Post category navigation">
             <a href="{% url 'blog:post_list' %}?q={{ q }}&sort={{ sort }}"
                class="category-link {% if not selected_category %}active{% endif %}">
                 All Posts
@@ -35,7 +49,7 @@
 
 <div class="page-head-row">
     <div>
-        <h1 class="section-title" style="margin-bottom: 0.4rem;">Blog posts</h1>
+        <h1 class="section-title section-title-tight">Blog posts</h1>
         <div class="current-category-chip">{{ current_category_label }}</div>
     </div>
 </div>
@@ -82,12 +96,15 @@
     </div>
 
     <div class="filter-right">
+        <label class="sr-only" for="searchQuery">Search posts</label>
         <input
+            id="searchQuery"
             type="text"
             name="q"
             value="{{ q }}"
             class="filter-input"
             placeholder="Search title, content, author..."
+            aria-label="Search posts by title, content, or author"
         >
         <button type="submit" class="btn btn-primary filter-btn">Search</button>
 
@@ -102,7 +119,28 @@
         <article class="card post-card">
             <a href="{% url 'blog:post_detail' post.pk %}" class="post-card-link">
                 {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="post-image">
+                    {% if forloop.first %}
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="{{ post.title }}"
+                            class="post-image"
+                            width="1200"
+                            height="675"
+                            loading="eager"
+                            fetchpriority="high"
+                            decoding="async"
+                        >
+                    {% else %}
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="{{ post.title }}"
+                            class="post-image"
+                            width="1200"
+                            height="675"
+                            loading="lazy"
+                            decoding="async"
+                        >
+                    {% endif %}
                 {% endif %}
 
                 <div class="post-card-topline">
@@ -112,17 +150,35 @@
                 </div>
 
                 <h3 class="post-title">{{ post.title }}</h3>
+
                 <p class="post-meta">
                     <span class="user-mini">
                         {% if post.author.profile.avatar %}
-                            <img class="avatar avatar-sm" src="{{ post.author.profile.avatar.url }}" alt="avatar">
+                            <img
+                                class="avatar avatar-sm"
+                                src="{{ post.author.profile.avatar.url }}"
+                                alt="{{ post.author.username }} avatar"
+                                width="40"
+                                height="40"
+                                loading="lazy"
+                                decoding="async"
+                            >
                         {% else %}
-                            <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+                            <img
+                                class="avatar avatar-sm"
+                                src="{% static 'img/avatar-default.png' %}"
+                                alt="{{ post.author.username }} avatar"
+                                width="40"
+                                height="40"
+                                loading="lazy"
+                                decoding="async"
+                            >
                         {% endif %}
                         <span>{{ post.author.username }}</span>
                     </span>
                     · {{ post.created_at|date:"Y-m-d H:i" }}
                 </p>
+
                 <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
             </a>
 
@@ -139,6 +195,8 @@
                         class="like-btn {% if post.id in liked_post_ids %}liked{% endif %}"
                         data-post-id="{{ post.pk }}"
                         data-like-url="{% url 'blog:toggle_like' post.pk %}"
+                        aria-pressed="{% if post.id in liked_post_ids %}true{% else %}false{% endif %}"
+                        aria-label="Like post {{ post.title }}"
                     >
                         <span class="like-icon">♥</span>
                         <span class="like-text">Like</span>
@@ -153,7 +211,13 @@
                         <span class="meta-count">{{ post.comment_total }}</span>
                     </a>
 
-                    <button type="button" class="like-btn" disabled title="Log in to like posts">
+                    <button
+                        type="button"
+                        class="like-btn"
+                        disabled
+                        title="Log in to like posts"
+                        aria-label="Log in to like post {{ post.title }}"
+                    >
                         <span class="like-icon">♥</span>
                         <span class="like-text">Like</span>
                         <span class="like-count">{{ post.total_likes }}</span>
@@ -174,7 +238,7 @@
 </div>
 
 {% if page_obj.has_other_pages %}
-    <div class="pagination">
+    <div class="pagination" aria-label="Pagination">
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}&category={{ selected_category }}&q={{ q }}&sort={{ sort }}">Previous</a>
         {% endif %}
@@ -222,7 +286,8 @@
                 <p>Get selected posts, journaling ideas, and gentle reminders delivered weekly.</p>
             </div>
             <form class="ad-form" action="#" method="get">
-                <input type="email" placeholder="Enter your email">
+                <label class="sr-only" for="digestEmail">Email for newsletter</label>
+                <input id="digestEmail" type="email" placeholder="Enter your email">
                 <button type="submit" class="btn btn-primary">Subscribe</button>
             </form>
         </div>

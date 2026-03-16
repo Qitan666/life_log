@@ -2,48 +2,81 @@
 {% block title %}{{ post.title }} - Life Log{% endblock %}
 {% block content %}
 {% load static %}
+
 <article class="card">
     {% if post.image %}
-        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="post-image">
+        <img
+            src="{{ post.image.url }}"
+            alt="{{ post.title }}"
+            class="post-image"
+            width="1200"
+            height="675"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+        >
     {% endif %}
+
     <h1 class="post-detail-title">{{ post.title }}</h1>
+
     <p class="post-meta">
         <span class="user-mini">
             {% if post.author.profile.avatar %}
-                <img class="avatar avatar-sm" src="{{ post.author.profile.avatar.url }}" alt="avatar">
+                <img
+                    class="avatar avatar-sm"
+                    src="{{ post.author.profile.avatar.url }}"
+                    alt="{{ post.author.username }} avatar"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                    decoding="async"
+                >
             {% else %}
-                <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
+                <img
+                    class="avatar avatar-sm"
+                    src="{% static 'img/avatar-default.png' %}"
+                    alt="{{ post.author.username }} avatar"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                    decoding="async"
+                >
             {% endif %}
             <span>{{ post.author.username }}</span>
         </span>
         · {{ post.created_at|date:"Y-m-d H:i" }}
     </p>
+
     <div class="post-content">{{ post.content }}</div>
+
     <div class="post-actions-bar">
-    {% if user.is_authenticated %}
-        <button
-            type="button"
-            class="like-btn {% if has_liked %}liked{% endif %}"
-            data-post-id="{{ post.pk }}"
-            data-like-url="{% url 'blog:toggle_like' post.pk %}"
-        >
-            <span class="like-icon">♥</span>
-            <span class="like-text">Like</span>
-            <span class="like-count">{{ post.total_likes }}</span>
-        </button>
-    {% else %}
-        <button
-            type="button"
-            class="like-btn"
-            disabled
-            title="Log in to like posts"
-        >
-            <span class="like-icon">♥</span>
-            <span class="like-text">Like</span>
-            <span class="like-count">{{ post.total_likes }}</span>
-        </button>
-    {% endif %}
-</div>
+        {% if user.is_authenticated %}
+            <button
+                type="button"
+                class="like-btn {% if has_liked %}liked{% endif %}"
+                data-post-id="{{ post.pk }}"
+                data-like-url="{% url 'blog:toggle_like' post.pk %}"
+                aria-pressed="{% if has_liked %}true{% else %}false{% endif %}"
+                aria-label="Like post {{ post.title }}"
+            >
+                <span class="like-icon">♥</span>
+                <span class="like-text">Like</span>
+                <span class="like-count">{{ post.total_likes }}</span>
+            </button>
+        {% else %}
+            <button
+                type="button"
+                class="like-btn"
+                disabled
+                title="Log in to like posts"
+                aria-label="Log in to like post {{ post.title }}"
+            >
+                <span class="like-icon">♥</span>
+                <span class="like-text">Like</span>
+                <span class="like-count">{{ post.total_likes }}</span>
+            </button>
+        {% endif %}
+    </div>
 
     {% if user == post.author %}
         <p class="actions-row">
@@ -53,52 +86,71 @@
     {% endif %}
 </article>
 
-<section class="card" style="margin-top: 1.5rem;" id="comments">
-    <h3 style="margin: 0 0 1rem;">Comments ({{ comments|length }})</h3>
+<section class="card comment-section" id="comments" aria-labelledby="comments-heading">
+    <h3 id="comments-heading" class="comments-title">Comments ({{ comments|length }})</h3>
 
     {% for comment in comments %}
-        <div style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-               <div class="comment-head">
-                   <span class="user-mini">
-                       {% if comment.author.profile.avatar %}
-                            <img class="avatar avatar-sm" src="{{ comment.author.profile.avatar.url }}" alt="avatar">
-                       {% else %}
-                            <img class="avatar avatar-sm" src="{% static 'img/avatar-default.png' %}" alt="avatar">
-                       {% endif %}
-                       <strong>{{ comment.author.username }}</strong>
-                   </span>
-                   <span class="comment-meta"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
-               </div>
+        <div class="comment-item">
+            <div class="comment-row">
+                <div class="comment-head">
+                    <span class="user-mini">
+                        {% if comment.author.profile.avatar %}
+                            <img
+                                class="avatar avatar-sm"
+                                src="{{ comment.author.profile.avatar.url }}"
+                                alt="{{ comment.author.username }} avatar"
+                                width="40"
+                                height="40"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                        {% else %}
+                            <img
+                                class="avatar avatar-sm"
+                                src="{% static 'img/avatar-default.png' %}"
+                                alt="{{ comment.author.username }} avatar"
+                                width="40"
+                                height="40"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                        {% endif %}
+                        <strong>{{ comment.author.username }}</strong>
+                    </span>
+                    <span class="comment-meta"> · {{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                </div>
 
                 {% if user.is_authenticated and user == comment.author %}
-                    <div style="display:flex; gap:8px;">
-                        <a class="btn btn-secondary" style="padding:6px 10px;"
+                    <div class="comment-actions">
+                        <a class="btn btn-secondary btn-sm"
                            href="{% url 'blog:comment_edit' post.pk comment.pk %}">Edit</a>
 
-                        <a class="btn btn-danger" style="padding:6px 10px;"
+                        <a class="btn btn-danger btn-sm"
                            href="{% url 'blog:comment_delete' post.pk comment.pk %}">Delete</a>
                     </div>
                 {% endif %}
             </div>
 
-            <p style="margin: 0.25rem 0 0; white-space: pre-wrap;">{{ comment.content }}</p>
+            <p class="comment-text">{{ comment.content }}</p>
         </div>
     {% empty %}
-        <p style="margin: 0; color: #666;">No comments yet.</p>
+        <p class="comment-empty">No comments yet.</p>
     {% endfor %}
 
     {% if user.is_authenticated %}
-        <form method="post" action="{% url 'blog:comment_create' post.pk %}" style="margin-top: 1rem;">
+        <form method="post" action="{% url 'blog:comment_create' post.pk %}" class="comment-form">
             {% csrf_token %}
             <div class="form-group">
+                <label for="{{ comment_form.content.id_for_label }}" class="sr-only">Write your comment</label>
                 {{ comment_form.content }}
-                {% if comment_form.content.errors %}<div class="form-errors">{{ comment_form.content.errors }}</div>{% endif %}
+                {% if comment_form.content.errors %}
+                    <div class="form-errors" role="alert">{{ comment_form.content.errors }}</div>
+                {% endif %}
             </div>
             <button type="submit" class="btn btn-primary">Post comment</button>
         </form>
     {% else %}
-        <p style="margin-top: 1rem; color: #666;">
+        <p class="comment-login-note">
             Log in to post a comment.
             <a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a>
         </p>

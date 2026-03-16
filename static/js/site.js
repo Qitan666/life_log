@@ -56,14 +56,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function openSidebar() {
         if (!sidebar) return;
+
         sidebar.classList.add("open");
-        if (sidebarBackdrop) sidebarBackdrop.classList.add("show");
+
+        if (sidebarBackdrop) {
+            sidebarBackdrop.classList.add("show");
+        }
+
+        if (sidebarToggle) {
+            sidebarToggle.setAttribute("aria-expanded", "true");
+        }
+
+        if (sidebarClose) {
+            sidebarClose.focus();
+        }
     }
 
     function closeSidebar() {
         if (!sidebar) return;
+
         sidebar.classList.remove("open");
-        if (sidebarBackdrop) sidebarBackdrop.classList.remove("show");
+
+        if (sidebarBackdrop) {
+            sidebarBackdrop.classList.remove("show");
+        }
+
+        if (sidebarToggle) {
+            sidebarToggle.setAttribute("aria-expanded", "false");
+            sidebarToggle.focus();
+        }
     }
 
     if (sidebarToggle) {
@@ -77,4 +98,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sidebarBackdrop) {
         sidebarBackdrop.addEventListener("click", closeSidebar);
     }
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && sidebar && sidebar.classList.contains("open")) {
+            closeSidebar();
+        }
+    });
 });

@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
 {% block title %}Log in - Life Log{% endblock %}
 {% block content %}
-<div class="card auth-card">
-    <h2 class="card-title">Log in</h2>
+<div class="card auth-card" aria-labelledby="login-heading">
+    <h2 id="login-heading" class="card-title">Log in</h2>
+
+    {% if form.errors %}
+        <div class="form-error-summary" role="alert" aria-live="assertive" tabindex="-1">
+            Please correct the highlighted fields and try again.
+        </div>
+    {% endif %}
+
     <form method="post" action="{% url 'accounts:login' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next }}">
+
         {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
+                {% if field.errors %}
+                    <div class="form-errors" role="alert">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
+
         <div class="auth-actions">
             <button type="submit" class="btn btn-primary">Log in</button>
             <a href="{% url 'accounts:register' %}" class="btn btn-secondary">No account yet? Sign up</a>

@@ -1,19 +1,33 @@
 {% extends 'base.html' %}
 {% block title %}Sign up - Life Log{% endblock %}
 {% block content %}
-<div class="card" style="max-width: 400px; margin: 2rem auto;">
-    <h2 style="margin-top: 0;">Create account</h2>
+<div class="card auth-card" aria-labelledby="register-heading">
+    <h2 id="register-heading" class="card-title">Create account</h2>
+
+    {% if form.errors %}
+        <div class="form-error-summary" role="alert" aria-live="assertive" tabindex="-1">
+            Please correct the highlighted fields and try again.
+        </div>
+    {% endif %}
+
     <form method="post" action="{% url 'accounts:register' %}">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
+                {% if field.errors %}
+                    <div class="form-errors" role="alert">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary">Sign up</button>
-        <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Already have an account? Log in</a>
+
+        <div class="auth-actions">
+            <button type="submit" class="btn btn-primary">Sign up</button>
+            <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Already have an account? Log in</a>
+        </div>
     </form>
 </div>
 {% endblock %}
